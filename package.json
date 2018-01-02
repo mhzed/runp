@@ -1,0 +1,26 @@
+{
+  "name": "runp",
+  "version": "1.0.0",
+  "description": "runp --------",
+  "main": "runp.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "tslint --project .",
+    "tswatch": "tsc --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "private": true,
+  "devDependencies": {
+    "@types/lodash.assign": "^4.2.3",
+    "@types/node": "^8.5.2",
+    "@types/nodeunit": "0.0.30",
+    "nodeunit": "^0.11.2",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.2"
+  },
+  "dependencies": {
+    "lodash.assign": "^4.2.0"
+  }
+}
