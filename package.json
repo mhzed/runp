@@ -2,7 +2,7 @@
   "name": "runp",
   "version": "1.0.0",
   "description": "runp --------",
-  "main": "runp.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tslint --project .",
