@@ -12,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "private": true,
+  "repository": {
+    "git" : "git+https://github.com/mhzed/runp"
+  },
   "devDependencies": {
     "@types/lodash.assign": "^4.2.3",
     "@types/node": "^8.5.2",
