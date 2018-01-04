@@ -3,7 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
 const assign = require("lodash.assign");
 require("colors");
-exports.runp = (label, command, option) => {
+/**
+ * label:  label any console output with this
+ * command: single string (option.shell is true) or command tokens (option.shell is false)
+ */
+function runp(label, command, option) {
     option = assign({
         stdio: 'pipe',
         shell: true,
@@ -23,16 +27,21 @@ exports.runp = (label, command, option) => {
     }
     let promise = new Promise((resolve, reject) => {
         process.on('error', (err) => reject(err));
-        process.stderr.on('data', (data) => {
-            if (option.showstderr)
-                console.error(`[${(label + '.stderr').red}]: ${data.toString().trim()}`);
-        });
-        process.stdout.on('data', (data) => {
-            if (option.verbose)
-                console.log(`[${label.grey}]: ${data.toString().trim()}`);
-        });
+        if (option.stdio === 'pipe') {
+            let stdlabel = label ? `[${label}] `.grey : '';
+            let stderrlabel = label ? `[${(label + '.stderr')}] `.red : '';
+            process.stderr.on('data', (data) => {
+                if (option.showstderr)
+                    console.error(`${stderrlabel}${data.toString().trim()}`);
+            });
+            process.stdout.on('data', (data) => {
+                if (option.verbose)
+                    console.log(`${stdlabel}${data.toString().trim()}`);
+            });
+        }
         process.on('close', (code) => code ? reject(new Error(`${label} process exit error code ${code}`)) : resolve());
     });
     return { process, promise };
-};
+}
+exports.runp = runp;
 //# sourceMappingURL=runp.js.map

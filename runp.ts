@@ -7,17 +7,20 @@ export type Task = {
   process: ChildProcess
 }
 export interface RunOption extends SpawnOptions {
-  verbose?: boolean,
+  verbose?: boolean,      // print to console even when in stdio 'pipe' mode
   showstderr?: boolean,
 }
-export const runp = (label: string, command: string | string[], option?: RunOption): Task => {
+/**
+ * label:  label any console output with this
+ * command: single string (option.shell is true) or command tokens (option.shell is false)
+ */
+export function runp (label: string, command: string | string[], option?: RunOption): Task {
   option = assign({ // the default options
     stdio: 'pipe', 
     shell: true,
     verbose: true,    // show cmd and stdout
     showstderr: false // do not show stderr
   }, option);
-
   
   let process: ChildProcess = null;
   if (option.shell) {
@@ -29,12 +32,16 @@ export const runp = (label: string, command: string | string[], option?: RunOpti
   }
   let promise = new Promise<void>((resolve, reject)=>{
     process.on('error', (err)=>reject(err));
-    process.stderr.on('data', (data)=>{
-      if (option.showstderr) console.error(`[${(label+'.stderr').red}]: ${data.toString().trim()}`)
-    });
-    process.stdout.on('data', (data)=>{
-      if (option.verbose) console.log(`[${label.grey}]: ${data.toString().trim()}`)
-    });
+    if (option.stdio === 'pipe') {
+      let stdlabel = label ? `[${label}] `.grey : '';
+      let stderrlabel = label ? `[${(label+'.stderr')}] `.red : '';    
+      process.stderr.on('data', (data)=>{
+        if (option.showstderr) console.error(`${stderrlabel}${data.toString().trim()}`)
+      });
+      process.stdout.on('data', (data)=>{
+        if (option.verbose) console.log(`${stdlabel}${data.toString().trim()}`)
+      });
+    }
     process.on('close', (code)=>
       code ? reject(new Error(`${label} process exit error code ${code}`)) : resolve()
     )
