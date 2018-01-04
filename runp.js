@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
 const assign = require("lodash.assign");
+require("colors");
 exports.runp = (label, command, option) => {
     option = assign({
         stdio: 'pipe',
@@ -9,23 +10,27 @@ exports.runp = (label, command, option) => {
         verbose: true,
         showstderr: false // do not show stderr
     }, option);
-    if (option.verbose)
-        console.log(`[${label} => ${command}]`);
     let process = null;
     if (option.shell) {
+        if (option.verbose)
+            console.log(`[${label} => ${command}]`.grey);
         process = child_process_1.spawn(command, [], option);
     }
     else {
+        if (option.verbose)
+            console.log(`[${label} => ${command.join(' ')}]`.grey);
         process = child_process_1.spawn(command[0], command.slice(1), option);
     }
     let promise = new Promise((resolve, reject) => {
         process.on('error', (err) => reject(err));
         process.stderr.on('data', (data) => {
             if (option.showstderr)
-                console.error(`[${label}.stderr]: ${data.toString().trim()}`);
+                console.error(`[${(label + '.stderr').red}]: ${data.toString().trim()}`);
         });
-        process.stdout.on('data', (data) => { if (option.verbose)
-            console.log(`[${label}]: ${data.toString().trim()}`); });
+        process.stdout.on('data', (data) => {
+            if (option.verbose)
+                console.log(`[${label.grey}]: ${data.toString().trim()}`);
+        });
         process.on('close', (code) => code ? reject(new Error(`${label} process exit error code ${code}`)) : resolve());
     });
     return { process, promise };
